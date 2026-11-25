@@ -46,6 +46,13 @@ MONOLOGUE = OPENING + " " + MIDDLE + " " + CLOSE
 MAX_CHARS = 600
 WORD_TARGET = 100
 
+# The entry text shipped in the repository beside this program. When the
+# program runs from the repository, its output must agree with that file
+# byte for byte, so the text reviewers read is the text the program writes.
+REPO_ENTRY_TXT = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "entry.txt"
+)
+
 
 def main() -> int:
     text = MONOLOGUE
@@ -62,6 +69,15 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if os.path.exists(REPO_ENTRY_TXT):
+        with open(REPO_ENTRY_TXT, "r", encoding="utf-8") as f:
+            shipped = f.read().strip()
+        if shipped != text:
+            print(
+                "monologue differs from the entry.txt shipped in the repository",
+                file=sys.stderr,
+            )
+            return 1
     out_path = "/output/entry.txt"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
